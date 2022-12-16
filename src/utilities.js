@@ -242,13 +242,20 @@ export const drawMesh = (predictions, ctx) => {
       });
       // Draw Dots
       for (let i = 0; i < keypoints.length; i++) {
-        const x = keypoints[i][0];
-        const y = keypoints[i][1];
-
-        ctx.beginPath();
-        ctx.arc(x, y, 1 /* radius */, 0, 3 * Math.PI);
-        ctx.fillStyle = "black";
-        ctx.fill();
+       if (i === 5) {
+          const image = new Image();
+          image.src = require("./test.jpeg");
+          image.onload = () => {
+            ctx.drawImage(image, keypoints[i][0], keypoints[i][1], 150, 150);
+          };
+        } else {
+          const x = keypoints[i][0];
+          const y = keypoints[i][1];
+          ctx.beginPath();
+          ctx.arc(x, y, 1, 0, 3 * Math.PI);
+          ctx.fillStyle = "black";
+          ctx.fill();
+        }
       }
     });
   }
