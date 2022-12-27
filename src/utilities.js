@@ -200,7 +200,6 @@ export const drawMesh = (predictions, ctx) => {
         //  Draw triangle
         drawPath(ctx, points, true);
       }
-
       // Draw eyes
       console.log(prediction.annotations);
       const rightEyeUpper0 = prediction.annotations.rightEyeUpper0;
@@ -242,9 +241,9 @@ export const drawMesh = (predictions, ctx) => {
       });
       // Draw Dots
       for (let i = 0; i < keypoints.length; i++) {
-       if (i === 5) {
+        if (i === 5) {
           const image = new Image();
-          image.src = require("./test.jpeg");
+          image.src = require("../src/image/test.jpeg");
           image.onload = () => {
             ctx.drawImage(image, keypoints[i][0], keypoints[i][1], 150, 150);
           };
