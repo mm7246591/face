@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 
 import * as tf from "@tensorflow/tfjs";
 import * as facemesh from "@tensorflow-models/face-landmarks-detection";
@@ -9,6 +9,9 @@ import "./App.css";
 const Face = ({}) => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+
+  const [deviceId, setDeviceId] = useState({});
+  const [devices, setDevices] = useState([]);
 
   //  Load posenet
   const runFacemesh = async () => {
@@ -52,28 +55,37 @@ const Face = ({}) => {
     }
   };
 
+  const handleDevices = useCallback(
+    (mediaDevices) =>
+      setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput")),
+    [setDevices]
+  );
+
   useEffect(() => {
     runFacemesh();
+    navigator.mediaDevices.enumerateDevices().then(handleDevices);
   }, []);
 
   return (
     <div className="App">
       <header className="App-header">
-        <Webcam
-          ref={webcamRef}
-          style={{
-            position: "absolute",
-            marginLeft: "auto",
-            marginRight: "auto",
-            left: 0,
-            right: 0,
-            textAlign: "center",
-            zindex: 9,
-            width: 640,
-            height: 480,
-          }}
-        />
-
+        {devices.map((device, key) => (
+          <Webcam
+            ref={webcamRef}
+            videoConstraints={{ deviceId: devices[1].deviceId }}
+            style={{
+              position: "absolute",
+              marginLeft: "auto",
+              marginRight: "auto",
+              left: 0,
+              right: 0,
+              textAlign: "center",
+              zindex: 9,
+              width: 640,
+              height: 480,
+            }}
+          />
+        ))}
         <canvas
           ref={canvasRef}
           style={{

@@ -201,7 +201,7 @@ export const drawMesh = (predictions, ctx) => {
         drawPath(ctx, points, true);
       }
       // Draw eyes
-      console.log(prediction.annotations);
+      // console.log(prediction.annotations);
       const rightEyeUpper0 = prediction.annotations.rightEyeUpper0;
       const rightEyeLower0 = prediction.annotations.rightEyeLower0;
       const rightEyeUpper1 = prediction.annotations.rightEyeUpper1;
