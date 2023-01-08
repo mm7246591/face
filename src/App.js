@@ -1,60 +1,56 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 
 import * as tf from "@tensorflow/tfjs";
-import * as facemesh from "@tensorflow-models/face-landmarks-detection";
 import Webcam from "react-webcam";
-import { drawMesh } from "./utilities";
+import draw from './utilities'
 import "./App.css";
 
 const Face = ({}) => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+  const returnTensors = false;
+  const blazeface = require('@tensorflow-models/blazeface')
 
   const [deviceId, setDeviceId] = useState({});
   const [devices, setDevices] = useState([]);
 
   //  Load posenet
-  const runFacemesh = async () => {
-    const net = await facemesh.load(
-      facemesh.SupportedPackages.mediapipeFacemesh
-    );
+  const runFacedetection = async () => {
+
+    const model = await blazeface.load()
+    console.log("FaceDetection Model is Loaded..") 
     setInterval(() => {
-      detect(net);
-    }, 1);
-  };
+      detect(model);
+    }, 100);
+}
 
-  const detect = async (net) => {
-    if (
-      typeof webcamRef.current !== "undefined" &&
-      webcamRef.current !== null &&
-      webcamRef.current.video.readyState === 4
-    ) {
-      // Get Video Properties
-      const video = webcamRef.current.video;
-      const videoWidth = webcamRef.current.video.videoWidth;
-      const videoHeight = webcamRef.current.video.videoHeight;
+  const detect = async (model) => {
+      if(
+          typeof webcamRef.current !== "undefined" &&
+          webcamRef.current !== null &&
+          webcamRef.current.video.readyState === 4
+        ){
+          // Get video properties
+          const video = webcamRef.current.video;
+          const videoWidth = webcamRef.current.video.videoWidth;
+          const videoHeight = webcamRef.current.video.videoHeight;
+     
+          //Set video height and width
+          webcamRef.current.video.width = videoWidth;
+          webcamRef.current.video.height = videoHeight;
+     
+          //Set canvas height and width
+            canvasRef.current.width = videoWidth;
+            canvasRef.current.height = videoHeight;
 
-      // Set video width
-      webcamRef.current.video.width = videoWidth;
-      webcamRef.current.video.height = videoHeight;
+          // Make detections
 
-      // Set canvas width
-      canvasRef.current.width = videoWidth;
-      canvasRef.current.height = videoHeight;
-
-      // Make Detections
-      // NEW MODEL
-      const face = await net.estimateFaces({ input: video });
-
-      // Get canvas context
-      const ctx = canvasRef.current.getContext("2d");
-
-      requestAnimationFrame(() => {
-        drawMesh(face, ctx);
-      });
-    }
-  };
-
+          const prediction = await model.estimateFaces(video, returnTensors);
+          const ctx = canvasRef.current.getContext("2d");
+          draw(prediction, ctx)
+        }
+  }
+  runFacedetection();
   const handleDevices = useCallback(
     (mediaDevices) =>
       setDevices(mediaDevices.filter(({ kind }) => kind === "videoinput")),
@@ -62,7 +58,6 @@ const Face = ({}) => {
   );
 
   useEffect(() => {
-    runFacemesh();
     navigator.mediaDevices.enumerateDevices().then(handleDevices);
   }, []);
 
@@ -72,7 +67,7 @@ const Face = ({}) => {
         {devices.map((device, key) => (
           <Webcam
             ref={webcamRef}
-            videoConstraints={{ deviceId: devices[1].deviceId }}
+            videoConstraints={{ deviceId: devices[0].deviceId }}
             style={{
               position: "absolute",
               marginLeft: "auto",
