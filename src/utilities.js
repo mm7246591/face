@@ -1,23 +1,26 @@
-// Drawing function
-const draw = (predictions, ctx) => {
-    if (predictions.length > 0) {
-        for (let i = 0; i < predictions.length; i++) {
-          const start = Math.round(predictions[i].topLeft[0]);
-          const end = Math.round(predictions[i].bottomRight[0]);
-          const a = Math.round(predictions[i].topLeft[1]);
-          const b = Math.round(predictions[i].bottomRight[1]);
+import React from "react";
+import Sketch from "react-p5";
+import bigNose from "./image/nose.png";
 
-          // ctx.beginPath();
-          // ctx.arc(a,b,5,0,2*Math.PI);
-          // ctx.stroke();
+const Draw = ({ predictions }) => {
+  let nose;
 
-          const image = new Image();
-          image.src = require("../src/image/nose.png");
-          image.onload = () => {
-            ctx.drawImage(image, (start+end)/2-20, (a+b)/2-30,50,50);
-          };
-        }  
+  const setup = async (p5) => {
+    await p5.createCanvas(640, 480);
+    nose = await p5.loadImage(bigNose);
+  };
+
+  const draw = (p5) => {
+    if (predictions.position.length > 0) {
+      for (let i = 0; i < predictions.position.length; i++) {
+        const start = Math.round(predictions.position[i].topLeft[0]);
+        const end = Math.round(predictions.position[i].bottomRight[0]);
+        const a = Math.round(predictions.position[i].topLeft[1]);
+        const b = Math.round(predictions.position[i].bottomRight[1]);
+        p5.image(nose, (start + end) / 2 - 20, (a + b) / 2 - 30, 50, 50);
       }
+    }
+
     //     topLeft: [232.28, 145.26],
     //     bottomRight: [449.75, 308.36],
     //     probability: [0.998],
@@ -29,6 +32,12 @@ const draw = (predictions, ctx) => {
     //       [252.76, 211.37], // right ear
     //       [431.20, 204.93] // left ear
     //     ]
+  };
+  return (
+    <div>
+      <Sketch setup={setup} draw={draw} />
+    </div>
+  );
 };
 
-export default draw
+export default Draw;
