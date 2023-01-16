@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import Phaser from 'phaser'
-import bigNose from '../image/nose.png'
+import BigNose from '../image/nose.png'
+import Vest from '../image/vest.png'
 
 const DrawPlayerTwo = () => {
   useEffect(() => {
@@ -29,27 +30,37 @@ const DrawPlayerTwo = () => {
   //Player
   const PlayerInformation = {
     PlayerTwo: {
-      X: 800,
-      Y: 400,
+      NoseX: 0,
+      NoseY: 0,
+      VestX:0,
+      VestY:0,
       isDetct:false,
     },
     PlayerMouseEasing: 0.1
   }
-  let nose
+  let nose;
+  let vest;
   function preload () {
-    this.load.image('nose', bigNose)
+    this.load.image('nose', BigNose);
+    this.load.image('vest', Vest);
   }
   function create () {
     nose = this.add
       .image(0, 0, 'nose')
       .setPosition(0, 0)
       .setScale(0.03, 0.03)
-      .setVisible(false)
+      .setVisible(false);
+    vest = this.add
+      .image(0, 0, 'vest')
+      .setPosition(0, 0)
+      .setScale(0.3, 0.3)
+      .setVisible(false);
   }
 
   function update () {
-    if(PlayerInformation.PlayerTwo.isDetct){
-      nose.setPosition(PlayerInformation.PlayerTwo.X-30, PlayerInformation.PlayerTwo.Y).setVisible(true)
+    if(PlayerInformation.PlayerOne.isDetct){
+      nose.setPosition(PlayerInformation.PlayerOne.NoseX-30, PlayerInformation.PlayerOne.NoseY).setVisible(true)
+      vest.setPosition(PlayerInformation.PlayerOne.VestX-30, PlayerInformation.PlayerOne.VestY).setVisible(true)
     }
   }
   function UsingWebSocket () {
@@ -58,9 +69,11 @@ const DrawPlayerTwo = () => {
        event.data.text().then(async(txt) => {
          let information = txt.split(",");
          if (information[0] === "two") {
-            PlayerInformation.PlayerTwo.isDetct=true;
-            PlayerInformation.PlayerTwo.X=parseInt(information[1]);
-            PlayerInformation.PlayerTwo.Y=parseInt(information[2]);
+          PlayerInformation.PlayerOne.isDetct=true;
+          PlayerInformation.PlayerOne.NoseX=parseInt(information[1]);
+          PlayerInformation.PlayerOne.NoseY=parseInt(information[2]);
+          PlayerInformation.PlayerOne.VestX=parseInt(information[3]);
+          PlayerInformation.PlayerOne.VestY=parseInt(information[4]);
          } 
        });
      };
